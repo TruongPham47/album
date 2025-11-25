@@ -1,0 +1,121 @@
+body {
+    margin: 0;
+    background: linear-gradient(to bottom, #ffe6f0, #ffcce0);
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    height: 100vh; /* Quan trọng cho hiệu ứng 3D */
+}
+
+.title {
+    text-align: center;
+    font-size: 24px;
+    color: #ff4d88;
+    margin-top: 20px;
+    animation: fadeInBounce 2s ease-out;
+    text-shadow: 0 0 8px rgba(255, 105, 180, 0.6);
+}
+
+@keyframes fadeInBounce {
+    0% { opacity: 0; transform: translateY(-20px); }
+    60% { opacity: 1; transform: translateY(10px); }
+    100% { transform: translateY(0); }
+}
+
+.gallery-wrap {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+}
+
+.photo-gallery {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    cursor: grab;
+}
+
+/* TRONG styles.css */
+
+/* TRONG styles.css */
+
+.photo-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 160px;
+    height: 220px;
+    transform-style: preserve-3d;
+    border-radius: 12px;
+    /* overflow: hidden;  <--- Có thể gây lỗi với box-reflect, hãy comment hoặc xóa */
+    cursor: pointer;
+    z-index: 10;
+    
+    /* BÓNG ĐỔ CƠ BẢN */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
+    
+    /* Transition cho hiệu ứng hover/kéo mượt mà */
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+    
+    /* QUAN TRỌNG: HIỆU ỨNG PHẢN CHIẾU ẢNH */
+    /* Phản chiếu toàn bộ nội dung của .photo-card (bao gồm thẻ img) */
+    -webkit-box-reflect: below 5px 
+                         linear-gradient(to bottom, 
+                                         rgba(0,0,0,0.0) 0%, /* Từ trong suốt */
+                                         rgba(0,0,0,0.3) 30%, /* Đến mờ nhẹ */
+                                         rgba(0,0,0,0.7) 100%); /* Đến mờ mạnh */
+}
+
+/* HIỆU ỨNG NÂNG CẤP: Hover */
+.photo-card:hover {
+    box-shadow: 0 15px 30px rgba(255, 105, 180, 0.7); 
+    transform: translateZ(50px) scale(1.1); 
+}
+
+.photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Có thể giữ hoặc bỏ filter drop-shadow cho img nếu không cần thêm bóng cho img */
+    /* filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.2)); */
+}
+
+/* Các đoạn CSS khác GIỮ NGUYÊN */
+
+/* Các đoạn CSS khác GIỮ NGUYÊN */
+.falling-elements-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.falling-element {
+    position: absolute;
+    top: -10vh;
+    border-radius: 50%;
+    animation: fall 8s linear forwards, sway 2s ease-in-out infinite;
+    opacity: 0.8;
+}
+
+@keyframes fall {
+    to { transform: translateY(110vh); }
+}
+@keyframes sway {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(20px); }
+}
+
+.footer {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+}
