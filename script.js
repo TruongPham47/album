@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let galleryScale = 1;
 
     // Thiết lập thời gian MỚI cho hiệu ứng Chia Bài (ĐÃ LÀM CHẬM)
-    const DEALING_TIME = 1200; // Thời gian bay của một thẻ (ms) - Nhanh hơn 800ms
-    const DEALING_DELAY = 150; // Khoảng cách giữa các thẻ (ms) - Nhanh hơn 100ms
+    const DEALING_TIME = 2000; // Thời gian bay của một thẻ (ms) - Nhanh hơn 800ms
+    const DEALING_DELAY = 300   ; // Khoảng cách giữa các thẻ (ms) - Nhanh hơn 100ms
 
     // --- Cập nhật vị trí ảnh theo vòng tròn ---
     function updateGalleryTransform() {
@@ -188,26 +188,74 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: false });
 
     // --- Hiệu ứng hoa rơi (GIỮ NGUYÊN) ---
-    const fallingContainer = document.querySelector('.falling-elements-container');
-    const types = ['leaf', 'heart'];
-    const colors = ['rgba(255,192,203,0.8)', 'rgba(255,105,180,0.9)', 'rgba(255,220,230,0.7)'];
+   const fallingContainer = document.querySelector('.falling-elements-container');
 
-    function createFallingElement() {
-        const element = document.createElement('div');
-        const type = types[Math.floor(Math.random() * types.length)];
-        const size = Math.random() * 15 + 10;
+function createFallingElement() {
+  const el = document.createElement('div');
 
-        element.classList.add('falling-element', type);
-        element.style.width = `${size}px`;
-        element.style.height = `${size}px`;
-        element.style.left = `${Math.random() * 100}vw`;
-        element.style.animationDuration = `${Math.random() * 5 + 5}s`;
-        element.style.animationDelay = `${Math.random() * -5}s`;
-        element.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+  const size = Math.random() * 15 + 10;
 
-        fallingContainer.appendChild(element);
-        element.addEventListener('animationend', () => element.remove());
+  el.classList.add('falling-element');
+
+  if (Math.random() > 0.5) {
+    el.classList.add('heart');
+  } else {
+    el.classList.add('leaf');
+  }
+
+  el.style.left = Math.random() * window.innerWidth + 'px';
+  el.style.width = size + 'px';
+  el.style.height = size + 'px';
+
+  el.style.animationDuration = Math.random() * 5 + 6 + 's';
+
+  // Màu
+  const colors = ['#ff4d88', '#ff99bb', '#ffc0cb', '#fff'];
+  el.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+  fallingContainer.appendChild(el);
+
+  el.addEventListener('animationend', () => el.remove());
+}
+
+// Tần suất rơi
+setInterval(createFallingElement, 200);
+
+// --- XỬ LÝ NHẠC NỀN TỰ ĐỘNG PHÁT ---
+
+    const backgroundMusic = document.getElementById('background-music');
+    let isMusicStarted = false;
+
+    // Hàm bắt đầu phát nhạc
+    function startMusic() {
+        if (!isMusicStarted) {
+            // Đảm bảo volume được đặt trước khi play
+            backgroundMusic.volume = 0.5; 
+            
+            // Chỉ gọi play()
+            backgroundMusic.play().then(() => {
+                console.log("Nhạc nền đã bắt đầu phát thành công.");
+                isMusicStarted = true;
+                
+                // Loại bỏ các sự kiện lắng nghe sau khi đã phát nhạc thành công
+                document.removeEventListener('click', startMusic);
+                document.removeEventListener('touchend', startMusic);
+                document.removeEventListener('mousemove', startMusic);
+
+            }).catch(error => {
+                // Console sẽ in ra cảnh báo nếu trình duyệt chặn phát nhạc 
+                // (ví dụ: do sự kiện mousemove quá yếu). Không cần làm gì thêm, 
+                // chỉ cần chờ sự tương tác tiếp theo.
+                console.warn("Chưa thể phát nhạc tự động. Vui lòng nhấp chuột hoặc chạm vào màn hình.");
+            });
+        }
     }
 
-    setInterval(createFallingElement, 300);
+    // Bắt đầu lắng nghe TƯƠNG TÁC MẠNH MẼ và SỰ KIỆN CHẠM
+    // Sử dụng 'click' (trên desktop) và 'touchend' (trên mobile) là đáng tin cậy nhất.
+    document.addEventListener('click', startMusic); 
+    document.addEventListener('touchend', startMusic); 
+
+    // Giữ lại 'mousemove' như một fallback (nhưng nó thường gây ra cảnh báo)
+    document.addEventListener('mousemove', startMusic);
 });
