@@ -10,13 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let isDragging = false;
     let startX = 0;
     let startRotation = 0;
-    let galleryScale = 1;
+    let galleryScale = 1; // Biến scale cho chức năng zoom/pinch
 
-    // Thiết lập thời gian MỚI cho hiệu ứng Chia Bài (ĐÃ LÀM CHẬM)
-    const DEALING_TIME = 2000; // Thời gian bay của một thẻ (ms) - Nhanh hơn 800ms
-    const DEALING_DELAY = 300   ; // Khoảng cách giữa các thẻ (ms) - Nhanh hơn 100ms
+    // Thiết lập thời gian MỚI cho hiệu ứng Chia Bài
+    const DEALING_TIME = 2000; 
+    const DEALING_DELAY = 300; 
 
-    // --- Cập nhật vị trí ảnh theo vòng tròn ---
+    // --- Cập nhật vị trí ảnh theo vòng tròn (ĐÃ SỬA VÀ THÊM LẠI TRANSFORM 3D) ---
     function updateGalleryTransform() {
         photoCards.forEach((card, index) => {
             // Tính toán vị trí 3D
@@ -25,12 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const z = radius * Math.sin(angle);
             const rotateY = angle * (180 / Math.PI) + 90;
 
+            // Đặt transform 3D và scale zoom (cardPulse sẽ tự động thêm scale nhịp đập)
             card.style.transform = `
                 translateX(-50%) translateY(-50%)
                 translate3d(${x}px, 0px, ${z}px)
                 rotateY(${rotateY}deg)
-                scale(${galleryScale})
+                scale(${galleryScale}) /* Thêm lại scale tổng thể (zoom) */
             `;
+            
             // Cài opacity = 1 cho các thẻ đã được chia
             if (card.style.opacity !== '0') { 
                 card.style.opacity = 1; 
@@ -58,14 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!animationId) animate();
     }
 
-    // --- CHỨC NĂNG CHIA ẢNH (Dealing Animation) ---
+    // --- CHỨC NĂNG CHIA ẢNH (Dealing Animation) (ĐÃ SỬA VÀ THÊM LẠI TRANSFORM 3D) ---
     function dealCards() {
         // 1. Đặt tất cả thẻ ở vị trí START
         photoCards.forEach(card => {
             card.style.opacity = 0;
             // Bắt đầu từ vị trí trung tâm (0, 0, 0) với scale nhỏ (chồng bài)
             card.style.transform = `translateX(-50%) translateY(-50%) translate3d(0px, 0px, 0px) rotateY(0deg) scale(0)`;
-            // Cài đặt transition cho hiệu ứng bay ra (SỬ DỤNG DEALING_TIME MỚI)
+            // Cài đặt transition cho hiệu ứng bay ra
             card.style.transition = `transform ${DEALING_TIME}ms ease-out, opacity ${DEALING_TIME * 0.5}ms ease-in`;
         });
 
@@ -78,12 +80,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const z = radius * Math.sin(angle);
                 const rotateY = angle * (180 / Math.PI) + 90;
 
-                // Kích hoạt chuyển động (đi tới vị trí 3D)
+                // Kích hoạt chuyển động (đi tới vị trí 3D + scale zoom ban đầu)
                 card.style.transform = `
                     translateX(-50%) translateY(-50%)
                     translate3d(${x}px, 0px, ${z}px)
                     rotateY(${rotateY}deg)
-                    scale(${galleryScale})
+                    scale(${galleryScale}) /* Thêm lại scale tổng thể (zoom) */
                 `;
                 card.style.opacity = 1;
 
@@ -98,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, DEALING_TIME); 
                 }
 
-            }, index * DEALING_DELAY + 100); // Mỗi thẻ chia cách nhau 150ms (DEALING_DELAY MỚI)
+            }, index * DEALING_DELAY + 100); 
         });
     }
     
@@ -165,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let startDistance = 0;
     gallery.addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) {
+            isDragging = false; // Tắt drag khi bắt đầu zoom
             const dx = e.touches[0].clientX - e.touches[1].clientX;
             const dy = e.touches[0].clientY - e.touches[1].clientY;
             startDistance = Math.sqrt(dx*dx + dy*dy);
@@ -190,38 +193,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Hiệu ứng hoa rơi (GIỮ NGUYÊN) ---
    const fallingContainer = document.querySelector('.falling-elements-container');
 
-function createFallingElement() {
-  const el = document.createElement('div');
+    function createFallingElement() {
+        const el = document.createElement('div');
 
-  const size = Math.random() * 15 + 10;
+        const size = Math.random() * 15 + 10;
 
-  el.classList.add('falling-element');
+        el.classList.add('falling-element');
 
-  if (Math.random() > 0.5) {
-    el.classList.add('heart');
-  } else {
-    el.classList.add('leaf');
-  }
+        if (Math.random() > 0.5) {
+            el.classList.add('heart');
+        } else {
+            el.classList.add('leaf');
+        }
 
-  el.style.left = Math.random() * window.innerWidth + 'px';
-  el.style.width = size + 'px';
-  el.style.height = size + 'px';
+        el.style.left = Math.random() * window.innerWidth + 'px';
+        el.style.width = size + 'px';
+        el.style.height = size + 'px';
 
-  el.style.animationDuration = Math.random() * 5 + 6 + 's';
+        el.style.animationDuration = Math.random() * 5 + 6 + 's';
 
-  // Màu
-  const colors = ['#ff4d88', '#ff99bb', '#ffc0cb', '#fff'];
-  el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        // Màu
+        const colors = ['#ff4d88', '#ff99bb', '#ffc0cb', '#fff'];
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
 
-  fallingContainer.appendChild(el);
+        fallingContainer.appendChild(el);
 
-  el.addEventListener('animationend', () => el.remove());
-}
+        el.addEventListener('animationend', () => el.remove());
+    }
 
-// Tần suất rơi
-setInterval(createFallingElement, 200);
+    // Tần suất rơi
+    setInterval(createFallingElement, 200);
 
-// --- XỬ LÝ NHẠC NỀN TỰ ĐỘNG PHÁT ---
+    // --- XỬ LÝ NHẠC NỀN TỰ ĐỘNG PHÁT (GIỮ NGUYÊN) ---
 
     const backgroundMusic = document.getElementById('background-music');
     let isMusicStarted = false;
@@ -229,33 +232,30 @@ setInterval(createFallingElement, 200);
     // Hàm bắt đầu phát nhạc
     function startMusic() {
         if (!isMusicStarted) {
-            // Đảm bảo volume được đặt trước khi play
             backgroundMusic.volume = 0.5; 
             
-            // Chỉ gọi play()
             backgroundMusic.play().then(() => {
                 console.log("Nhạc nền đã bắt đầu phát thành công.");
                 isMusicStarted = true;
                 
-                // Loại bỏ các sự kiện lắng nghe sau khi đã phát nhạc thành công
+                // KÍCH HOẠT ANIMATION NHỊP ĐẬP
+                photoCards.forEach(card => {
+                    card.style.animationPlayState = 'running';
+                });
+                
+                // Loại bỏ các sự kiện lắng nghe
                 document.removeEventListener('click', startMusic);
                 document.removeEventListener('touchend', startMusic);
                 document.removeEventListener('mousemove', startMusic);
 
             }).catch(error => {
-                // Console sẽ in ra cảnh báo nếu trình duyệt chặn phát nhạc 
-                // (ví dụ: do sự kiện mousemove quá yếu). Không cần làm gì thêm, 
-                // chỉ cần chờ sự tương tác tiếp theo.
                 console.warn("Chưa thể phát nhạc tự động. Vui lòng nhấp chuột hoặc chạm vào màn hình.");
             });
         }
     }
 
-    // Bắt đầu lắng nghe TƯƠNG TÁC MẠNH MẼ và SỰ KIỆN CHẠM
-    // Sử dụng 'click' (trên desktop) và 'touchend' (trên mobile) là đáng tin cậy nhất.
+    // Bắt đầu lắng nghe TƯƠNG TÁC
     document.addEventListener('click', startMusic); 
     document.addEventListener('touchend', startMusic); 
-
-    // Giữ lại 'mousemove' như một fallback (nhưng nó thường gây ra cảnh báo)
     document.addEventListener('mousemove', startMusic);
 });

@@ -1,11 +1,11 @@
 body {
     margin: 0;
-   
-   background: linear-gradient(135deg, 
-        #2a3a57 0%,     /* Xanh Navy Sáng */
-        #1c283d 35%,    /* Xanh Đen Sâu */
-        #141d2e 65%,    /* Xám Than */
-        #0a101b 100%    /* Đen Thẫm */
+    
+    background: linear-gradient(135deg, 
+        #2a3a57 0%,      /* Xanh Navy Sáng */
+        #1c283d 35%,     /* Xanh Đen Sâu */
+        #141d2e 65%,     /* Xám Than */
+        #0a101b 100%     /* Đen Thẫm */
     );
 
     /* chuyển động nền nhẹ */
@@ -31,6 +31,12 @@ body {
     100% { background-position: 0% 50%; }
 }
 
+@keyframes fadeInBounce {
+    0% { opacity: 0; transform: translateY(-50px); }
+    60% { opacity: 1; transform: translateY(10px); }
+    100% { transform: translateY(0); }
+}
+
 .gallery-wrap {
     position: relative;
     width: 100%;
@@ -50,8 +56,37 @@ body {
 }
 
 
-
-
+/* Keyframes mới cho hiệu ứng Glow Border */
+@keyframes glowBorder {
+    0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 15px rgba(0, 255, 255, 0.2); }
+    50% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.4); }
+    100% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 15px rgba(0, 255, 255, 0.2); }
+}
+/* Keyframes SỬA LẠI: Màu Xanh Neon/Cyan (Masculine Tech Vibe) */
+@keyframes cardPulse {
+    0% { 
+        --card-scale-pulse: 1;
+        filter: brightness(1); 
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4), 
+                    /* MÀU: Xanh nhạt/Cyan tối */
+                    0 0 5px rgba(0, 150, 255, 0.6); 
+    }
+    50% { 
+        --card-scale-pulse: 1.05;
+        filter: brightness(1.3) saturate(1.5); /* Tăng độ sáng và bão hòa */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7), 
+                    /* MÀU: Xanh Neon sáng (Electric Blue/Cyan) */
+                    0 0 20px rgba(0, 255, 255, 1),
+                    0 0 40px rgba(0, 255, 255, 0.5); /* Thêm lớp lan tỏa */ 
+    } 
+    100% { 
+        --card-scale-pulse: 1; 
+        filter: brightness(1); 
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4), 
+                    /* MÀU: Xanh nhạt/Cyan tối */
+                    0 0 5px rgba(0, 150, 255, 0.6); 
+    }
+}
 .photo-card {
     position: absolute;
     top: 50%;
@@ -63,33 +98,58 @@ body {
     cursor: pointer;
     z-index: 10;
     
-    /* BÓNG ĐỔ CƠ BẢN */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
+    /* Thiết lập biến CSS mặc định cho nhịp đập */
+    --card-scale-pulse: 1; 
+    
+    /* BÓNG ĐỔ VÀ GLOW BAN ĐẦU */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4), 
+                0 0 8px rgba(0, 255, 255, 0.3); 
+    
+    /* CÁCH KẾT HỢP TRANSFORM: JS sẽ đặt translate/rotate, CSS sẽ tự thêm scale(pulse) */
+    /* Giá trị này sẽ được JS GHI ĐÈ, nhưng animation cardPulse vẫn chạy được */
+    transform: scale(var(--card-scale-pulse)); 
     
     /* Transition cho hiệu ứng hover/kéo mượt mà */
     transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
-    
+    /* Animation nhịp đập (paused) */
+    animation: cardPulse 0.8s ease-in-out infinite alternate paused;
 
     /* Phản chiếu toàn bộ nội dung của .photo-card (bao gồm thẻ img) */
     -webkit-box-reflect: below 5px 
                          linear-gradient(to bottom, 
-                                         rgba(0,0,0,0.0) 0%, /* Từ trong suốt */
-                                         rgba(0,0,0,0.3) 30%, /* Đến mờ nhẹ */
-                                         rgba(0,0,0,0.7) 100%); /* Đến mờ mạnh */
+                                         rgba(0,0,0,0.0) 0%, 
+                                         rgba(0,0,0,0.3) 30%, 
+                                         rgba(0,0,0,0.7) 100%); 
 }
 
-/* HIỆU ỨNG NÂNG CẤP: Hover */
+/* HIỆU ỨNG THU HÚT MỚI: Hover */
 .photo-card:hover {
-    box-shadow: 0 15px 30px rgba(255, 105, 180, 0.7); 
-    transform: translateZ(50px) scale(1.1); 
+    /* Nổi bật hơn, xoay nhẹ */
+    /* Sử dụng scale cố định cho hover, ghi đè nhịp đập */
+    transform: translateZ(80px) scale(1.15) rotateY(5deg); 
+    
+    /* Bóng đổ sáng và glow mạnh hơn */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 
+                0 0 25px rgba(0, 255, 255, 0.9), 
+                0 0 50px rgba(0, 255, 255, 0.4); 
+    
+    filter: brightness(1.2) contrast(1.1); 
+    
+    /* Kích hoạt animation glow border */
+    animation: glowBorder 1.5s ease-in-out infinite alternate;
+
+    /* Dừng nhịp đập khi hover */
+    animation-play-state: paused;
 }
 
 .photo-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: filter 0.3s ease-out; /* Transition cho filter */
 }
 
+/* Các phần hoa rơi và responsive giữ nguyên */
 .falling-elements-container {
     position: fixed;
     top: 0;
